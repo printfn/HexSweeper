@@ -334,6 +334,7 @@ class HexGrid:
                                          # see tile.py for more info on this
 
         self.mines_have_been_generated = True
+        self.start_time = time.time() # save number of seconds since epoch
 
     def primary_click(self, screen_x, screen_y, apothem, redraw, show_alert):
         (x, y) = self.screen_coordinates_to_game_position(
