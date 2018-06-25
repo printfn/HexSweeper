@@ -1,3 +1,8 @@
+"""
+This module implements the UI where the user can choose a custom difficulty.
+It corresponds to the window accessible under Game -> New (Custom).
+"""
+
 from tkinter import *
 
 from hexgrid import HexGrid
@@ -18,33 +23,32 @@ class ChooseDifficultyUI:
         # to stretch as the window is resized
 
         # stretch the second column horizontally:
-        Grid.columnconfigure(self.window, 1, weight = 1)
+        Grid.columnconfigure(self.window, 1, weight=1)
         # stretch the fourth row vertically:
-        Grid.rowconfigure(self.window, 3, weight = 1)
+        Grid.rowconfigure(self.window, 3, weight=1)
 
-        Label(self.window, text = 'Board Size:') \
-            .grid(row = 0, column = 0, sticky = W)
+        Label(self.window, text='Board Size:').grid(row=0, column=0, sticky=W)
         # TkInter "Scale" objects are sliders
         self.game_size_slider = Scale(
             self.window,
             # from_ because from is a Python keyword
-            from_ = 2,
-            to = 15,
-            orient = HORIZONTAL,
-            command = lambda event: self.update_slider_range(event)
+            from_=2,
+            to=15,
+            orient=HORIZONTAL,
+            command=lambda event: self.update_slider_range(event)
         ) # default slider resolution/accuracy is 1
-        self.game_size_slider.grid(row = 0, column = 1, sticky = E + W)
+        self.game_size_slider.grid(row=0, column=1, sticky=E + W)
 
-        Label(self.window, text = 'Number of mines:') \
-            .grid(row = 1, column = 0, sticky = W)
+        Label(self.window, text='Number of mines:') \
+            .grid(row=1, column=0, sticky=W)
         self.mine_count_slider = Scale(
             self.window,
-            from_ = 1,
-            to = 315,
-            orient = HORIZONTAL,
-            command = lambda event: self.draw_field()
+            from_=1,
+            to=315,
+            orient=HORIZONTAL,
+            command=lambda event: self.draw_field()
         )
-        self.mine_count_slider.grid(row = 1, column = 1, sticky = E + W)
+        self.mine_count_slider.grid(row=1, column=1, sticky=E + W)
 
         # set default slider values to values from the previous game
         # this makes it easier for the user to make small adjustments
@@ -52,7 +56,7 @@ class ChooseDifficultyUI:
         self.game_size_slider.set(self.game_ui.hex_grid.size)
         self.last_size = self.game_ui.hex_grid.size
         self.mine_count_slider.config(
-            to = HexGrid.highest_possible_mine_count_for_size(
+            to=HexGrid.highest_possible_mine_count_for_size(
                 self.game_ui.hex_grid.size
             )
         )
@@ -60,18 +64,18 @@ class ChooseDifficultyUI:
 
         Button(
             self.window,
-            text = 'Select difficulty',
-            command = self.select_difficulty_clicked
-        ).grid(row = 2, column = 0, columnspan = 2)
+            text='Select difficulty',
+            command=self.select_difficulty_clicked
+        ).grid(row=2, column=0, columnspan=2)
 
-        self.canvas = Canvas(self.window, bg = 'white')
+        self.canvas = Canvas(self.window, bg='white')
         self.canvas.grid(
-            row = 3,
-            column = 0,
+            row=3,
+            column=0,
             # span columns 0 and 1
-            columnspan = 2,
+            columnspan=2,
             # resize with the window
-            sticky = E + N + W + S)
+            sticky=E + N + W + S)
 
         self.border = 5
         self.draw_field()
@@ -107,7 +111,7 @@ class ChooseDifficultyUI:
             HexGrid.highest_possible_mine_count_for_size(new_size)
 
         # update mine count slider upper bound
-        self.mine_count_slider.config(to = new_max_mine_count)
+        self.mine_count_slider.config(to=new_max_mine_count)
 
         # Calculate new suggested mine count using proportion
         # of mines to total mine count (here max_mine_count, which
