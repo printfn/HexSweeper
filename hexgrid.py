@@ -262,23 +262,15 @@ class HexGrid:
                     self[pos].reveal()
             redraw()
             end_time = time.time()
-            m, s = divmod(end_time - self.start_time, 60)
+            m = (end_time - self.start_time) // 60
+            s = end_time - self.start_time - 60 * m
             duration = ""
             if m == 0:
-                if s == 1:
-                    duration = "1 second"
-                else:
-                    duration = "%01d seconds" % s
+                duration = "%1.3f seconds" % s
             elif m == 1:
-                if s == 1:
-                    duration = "1 minute and 1 second"
-                else:
-                    duration = "1 minute and %01d seconds" % s
+                duration = "1 minute and %1.3f seconds" % s
             else:
-                if s == 1:
-                    duration = "%01d minutes and 1 second" % m
-                else:
-                    duration = "%01d minutes and %01d seconds" % (m, s)
+                duration = "%d minutes and %1.3f seconds" % (m, s)
             show_alert(
                 "Minesweeper",
                 "Congratulations!\nYou won the game in {}." \
