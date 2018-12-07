@@ -1,3 +1,7 @@
+"""
+This module contains the Tile class, which described a single hexagonal tile.
+"""
+
 class Tile:
     """
     This class contains all data required to define a tile.
@@ -6,40 +10,48 @@ class Tile:
     """
     def __init__(self, game, x, y):
         self.game = game
-        self.x = x
-        self.y = y
+        self.x_coord = x
+        self.y_coord = y
         self._revealed = False
         self._mine = False
         self._flag = False
-    # accessors (getters) for the private instance variables
+
     def is_revealed(self):
+        """ Checks if the tile is revealed (i.e. has been clicked on) """
         return self._revealed
+
     def has_mine(self):
+        """ Checks if the tile has a mine """
         return self._mine
+
     def has_flag(self):
+        """ Checks if the user has set a flag on this tile """
         return self._flag
 
-    # colour to use for rendering this tile as a hexagon
     def color(self):
+        """ Colour to use for rendering this tile as a hexagon """
         if self.is_revealed():
             if self.has_mine():
                 return 'red'
-            if self.game.adjacent_mine_count(self.x, self.y) > 0:
+            if self.game.adjacent_mine_count(self.x_coord, self.y_coord) > 0:
                 return 'orange'
             return 'lightgreen'
-        else:
-            if self.has_flag():
-                return 'purple'
-            return 'lightblue'
+        if self.has_flag():
+            return 'purple'
+        return 'lightblue'
+
     def text(self):
-        if not self.has_mine():
-            if self.is_revealed():
-                if self.game.adjacent_mine_count(self.x, self.y) > 0:
-                    return str(self.game.adjacent_mine_count(self.x, self.y))
+        """ Text that should be shown on this tile """
+        if not self.has_mine() and self.is_revealed():
+            if self.game.adjacent_mine_count(self.x_coord, self.y_coord) > 0:
+                return str(self.game.adjacent_mine_count(
+                    self.x_coord, self.y_coord))
         # otherwise return None, which will prevent
         # any text from being shown on this tile
         return None
+
     def can_toggle_flag(self):
+        """ Whether the user is allowed to set/unset flags on this tile """
         if self.has_flag():
             return True
         old_color = self.color()
@@ -49,29 +61,42 @@ class Tile:
         if old_color == new_color:
             return False
         return True
-    # Tile.__init__ only creates non-mine tiles. This method
-    # can then be used to change some of those tiles into mines
+
     def change_into_mine(self):
+        """
+        Tile.__init__ only creates non-mine tiles. This method
+        can then be used to change some of those tiles into mines.
+        """
         self._mine = True
+
     def set_flag(self):
+        """ If allowed, change this tile to have a flag """
         if self.has_flag():
             return
         if not self.can_toggle_flag():
             return
         self._flag = True
+
     def unset_flag(self):
+        """ If allowed, change this tile to not have a flag """
         if not self.has_flag():
             return
         if not self.can_toggle_flag():
             return
         self._flag = False
-    # called on left-click and also when the game is over
-    # and all tiles (incl. mine positions) are revealed to the user.
+
     def reveal(self):
+        """
+        Called on left-click and also when the game is over
+        and all tiles (incl. mine positions) are revealed to the user.
+        """
         if not self.has_flag():
             self._revealed = True
-    # useful only for debugging: this text is printed to the console when
-    # you try to print a tile object.
+
     def __repr__(self):
+        """
+        Useful only for debugging: this text is printed to the console when
+        you try to print a tile object.
+        """
         return '<Tile revealed={} mine={} flag={}>' \
             .format(self.is_revealed(), self.has_mine(), self.has_flag())
