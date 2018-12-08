@@ -1,4 +1,3 @@
 # HexSweeper
 
-This small Python program is a hexagonal Minesweeper implementation.
-Uses the Tkinter GUI framework.
+This is a hexagonal Minesweeper implementation in Python 3, using the Tkinter GUI framework.
