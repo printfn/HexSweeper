@@ -3,12 +3,16 @@ This module implements the UI where the user can choose a custom difficulty.
 It corresponds to the window accessible under Game -> New (Custom).
 """
 
-from tkinter import *
+from tkinter import Toplevel, Grid, Label, Button, Canvas, Scale
+from tkinter import HORIZONTAL, N, E, S, W
 
 from hexgrid import HexGrid
 from hexgrid_ui_utilities import HexGridUIUtilities
 
 class ChooseDifficultyUI:
+    """
+    This class represents the window used to choose a custom game difficulty.
+    """
     def __init__(self, game_ui):
         self.game_ui = game_ui
         # programs can only have one window, but can
@@ -35,7 +39,7 @@ class ChooseDifficultyUI:
             from_=2,
             to=15,
             orient=HORIZONTAL,
-            command=lambda event: self.update_slider_range(event)
+            command=lambda event: self.update_slider_range()
         ) # default slider resolution/accuracy is 1
         self.game_size_slider.grid(row=0, column=1, sticky=E + W)
 
@@ -64,7 +68,7 @@ class ChooseDifficultyUI:
 
         Button(
             self.window,
-            text='Select difficulty',
+            text='Select this difficulty',
             command=self.select_difficulty_clicked
         ).grid(row=2, column=0, columnspan=2)
 
@@ -77,7 +81,6 @@ class ChooseDifficultyUI:
             # resize with the window
             sticky=E + N + W + S)
 
-        self.border = 5
         self.draw_field()
 
         # put self.window in the foreground and
@@ -86,7 +89,12 @@ class ChooseDifficultyUI:
         self.window.grab_set()
         self.game_ui.window.wait_window(self.window)
 
-    def update_slider_range(self, event):
+    @staticmethod
+    def border():
+        """ Return fixed border size (on all sides) """
+        return 20
+
+    def update_slider_range(self):
         """
         When the board size slider is adjusted, the mine count slider
         is readjusted to maintain the same ratio of empty tiles
@@ -131,6 +139,9 @@ class ChooseDifficultyUI:
         self.draw_field()
 
     def draw_field(self):
+        """
+        Redraw the preview field. Includes generating a new HexGrid.
+        """
         size = self.game_size_slider.get()
         mine_count = self.mine_count_slider.get()
         # create a new, random HexGrid on every redraw
@@ -148,7 +159,7 @@ class ChooseDifficultyUI:
         for pos in self.hex_grid.all_valid_coords():
             self.hex_grid[pos].reveal()
         # finally draw the field, just like in the actual game (see game_ui.py)
-        HexGridUIUtilities.draw_field(self)
+        HexGridUIUtilities.draw_field(self, self.border())
 
     def select_difficulty_clicked(self):
         """
