@@ -4,7 +4,6 @@ window and its various UI elements.
 """
 
 from tkinter import Tk, Canvas, Menu
-# messagebox is a submodule, so it's not imported automatically
 from tkinter import messagebox
 
 from hexgrid import HexGrid
