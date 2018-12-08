@@ -1,6 +1,7 @@
 """
-This module implements the UI where the user can choose a custom difficulty.
-It corresponds to the window accessible under Game -> New (Custom).
+This module implements the UI where the user can choose a custom
+difficulty. It corresponds to the window accessible under
+Game -> New (Custom).
 """
 
 from tkinter import Toplevel, Grid, Label, Button, Canvas, Scale
@@ -11,7 +12,8 @@ from hexgrid_ui_utilities import HexGridUIUtilities
 
 class ChooseDifficultyUI:
     """
-    This class represents the window used to choose a custom game difficulty.
+    This class represents the window used to choose a
+    custom game difficulty.
     """
     def __init__(self, game_ui):
         self.game_ui = game_ui
@@ -19,8 +21,9 @@ class ChooseDifficultyUI:
         # create multiple "Toplevel"s (effectively new windows)
         self.window = Toplevel()
         self.window.title('HexSweeper - Choose Difficulty')
-        self.window.geometry('400x473') # size maximises space in the window
-        self.window.bind('<Configure>', lambda event: self.draw_field())
+        self.window.geometry('400x473')
+        self.window.bind('<Configure>',
+                         lambda event: self.draw_field())
         self.window.protocol("WM_DELETE_WINDOW", self.on_window_close)
 
         # these statements allow the hexgrid (in col 1, row 3)
@@ -31,8 +34,11 @@ class ChooseDifficultyUI:
         # stretch the fourth row vertically:
         Grid.rowconfigure(self.window, 3, weight=1)
 
-        Label(self.window, text='Board Size:').grid(row=0, column=0, sticky=W)
+        Label(self.window, text='Board Size:').grid(
+            row=0, column=0, sticky=W)
+
         # TkInter "Scale" objects are sliders
+        # Default slider resolution/accuracy is 1
         self.game_size_slider = Scale(
             self.window,
             # from_ because from is a Python keyword
@@ -40,7 +46,7 @@ class ChooseDifficultyUI:
             to=15,
             orient=HORIZONTAL,
             command=lambda event: self.update_slider_range()
-        ) # default slider resolution/accuracy is 1
+        )
         self.game_size_slider.grid(row=0, column=1, sticky=E + W)
 
         Label(self.window, text='Number of mines:') \
@@ -114,7 +120,8 @@ class ChooseDifficultyUI:
 
         # start by setting up some variables for later
         last_max_mine_count = \
-            HexGrid.highest_possible_mine_count_for_size(self.last_size)
+            HexGrid.highest_possible_mine_count_for_size(
+                self.last_size)
         new_max_mine_count = \
             HexGrid.highest_possible_mine_count_for_size(new_size)
 
@@ -158,7 +165,8 @@ class ChooseDifficultyUI:
         # mines) need to be revealed
         for pos in self.hex_grid.all_valid_coords():
             self.hex_grid[pos].reveal()
-        # finally draw the field, just like in the actual game (see game_ui.py)
+        # finally draw the field, just like in the
+        # actual game (see game_ui.py)
         HexGridUIUtilities.draw_field(self, self.border())
 
     def select_difficulty_clicked(self):

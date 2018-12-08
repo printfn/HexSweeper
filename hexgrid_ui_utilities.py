@@ -1,6 +1,6 @@
 """
-This module contains only the HexGridUIUtilities class, which provides static
-utility methods for the UI code.
+This module contains only the HexGridUIUtilities class, which provides
+static utility methods for the UI code.
 """
 
 import math
@@ -29,57 +29,84 @@ class HexGridUIUtilities:
         apot = ui_instance.apothem # distance from hex center to
                     # the middle of one of its sides.
         ui_instance.canvas.create_polygon(
-            -apot + size_x, apot / math.sqrt(3) + size_y,  # lower left vertex
-            -apot + size_x, -apot / math.sqrt(3) + size_y, # upper left vertex
-            0 + size_x, -2 * apot / math.sqrt(3) + size_y, # topmost vertex
-            apot + size_x, -apot / math.sqrt(3) + size_y,  # upper right vertex
-            apot + size_x, apot / math.sqrt(3) + size_y,   # lower right vertex
-            0 + size_x, 2 * apot / math.sqrt(3) + size_y,  # bottommost vertex
-            fill=fill, outline='') # empty string == transparent outline
+            # lower left vertex
+            -apot + size_x, apot / math.sqrt(3) + size_y,
+            # upper left vertex
+            -apot + size_x, -apot / math.sqrt(3) + size_y,
+            # topmost vertex
+            0 + size_x, -2 * apot / math.sqrt(3) + size_y,
+            # upper right vertex
+            apot + size_x, -apot / math.sqrt(3) + size_y,
+            # lower right vertex
+            apot + size_x, apot / math.sqrt(3) + size_y,
+            # bottommost vertex
+            0 + size_x, 2 * apot / math.sqrt(3) + size_y,
+            # empty string means transparent outline
+            fill=fill, outline='')
 
-        # draw outline separately to prevent antialiasing issues
-        # when window width/height are not divisible by tile size/apothem
-        # all hexagons need left, top left and top right outlines
+        # Draw outline separately to prevent antialiasing issues
+        # when window width/height are not divisible by tile
+        # size/apothem respectively.
+        # All hexagons need left, top left and top right outlines
         ui_instance.canvas.create_line(
-            -apot + size_x, apot / math.sqrt(3) + size_y,  # lower left vertex
-            -apot + size_x, -apot / math.sqrt(3) + size_y) # upper left vertex
+            # lower left vertex
+            -apot + size_x, apot / math.sqrt(3) + size_y,
+            # upper left vertex
+            -apot + size_x, -apot / math.sqrt(3) + size_y)
         ui_instance.canvas.create_line(
-            -apot + size_x, -apot / math.sqrt(3) + size_y, # upper left vertex
-            0 + size_x, -2 * apot / math.sqrt(3) + size_y) # topmost vertex
+            # upper left vertex
+            -apot + size_x, -apot / math.sqrt(3) + size_y,
+            # topmost vertex
+            0 + size_x, -2 * apot / math.sqrt(3) + size_y)
         ui_instance.canvas.create_line(
-            0 + size_x, -2 * apot / math.sqrt(3) + size_y, # topmost vertex
-            apot + size_x, -apot / math.sqrt(3) + size_y)  # upper right vertex
+            # topmost vertex
+            0 + size_x, -2 * apot / math.sqrt(3) + size_y,
+            # upper right vertex
+            apot + size_x, -apot / math.sqrt(3) + size_y)
 
         (field_x, field_y) = game_pos
-        # only hexagons on the far right (x == cell_count - 1)
+
+        grid_size = ui_instance.hex_grid.size
+        row_count = ui_instance.hex_grid.row_count()
+        row_cell_count = ui_instance.hex_grid.cell_count_in_row(
+            field_y)
+
+        # only hexagons on the far right (x == row_cell_count - 1)
         # need a right-hand-side outline
-        if field_x == ui_instance.hex_grid.cell_count_in_row(field_y) - 1:
+        if field_x == row_cell_count - 1:
             ui_instance.canvas.create_line(
-                apot + size_x, -apot / math.sqrt(3) + size_y, # upper right vtx
-                apot + size_x, apot / math.sqrt(3) + size_y)  # lower right vtx
+                # upper right vertex
+                apot + size_x, -apot / math.sqrt(3) + size_y,
+                # lower right vertex
+                apot + size_x, apot / math.sqrt(3) + size_y)
 
         # only hexagons on the bottom row (y == row_count - 1)
         # and hexagons on the far right, but on or below the center
-        # row (x == cell_count - 1 and y >= size - 1)
+        # row (x == row_cell_count - 1 and y >= grid_size - 1)
         # need a bottom-right outline
-        if field_y == ui_instance.hex_grid.row_count() - 1 \
-            or (field_x == ui_instance.hex_grid.cell_count_in_row(field_y) - 1 \
-                and field_y >= ui_instance.hex_grid.size - 1):
+        if field_y == row_count - 1 \
+            or (field_x == row_cell_count - 1 \
+                and field_y >= grid_size - 1):
             ui_instance.canvas.create_line(
-                apot + size_x, apot / math.sqrt(3) + size_y,  # lower right vtx
-                0 + size_x, 2 * apot / math.sqrt(3) + size_y) # bottommost vtx
+                # lower right vertex
+                apot + size_x, apot / math.sqrt(3) + size_y,
+                # bottommost vertex
+                0 + size_x, 2 * apot / math.sqrt(3) + size_y)
 
         # only hexagons on the bottom row (y == row_count - 1)
         # and hexagons on the far left and on or below the center row
         # (x == 0 and y >= size - 1) need a bottom-left outline
-        if field_y == ui_instance.hex_grid.row_count() - 1 \
-            or (field_x == 0 and field_y >= ui_instance.hex_grid.size - 1):
+        if field_y == row_count - 1 \
+            or (field_x == 0 and field_y >= grid_size - 1):
             ui_instance.canvas.create_line(
-                0 + size_x, 2 * apot / math.sqrt(3) + size_y, # bottommost vtx
-                -apot + size_x, apot / math.sqrt(3) + size_y) # lower left vtx
+                # bottommost vertex
+                0 + size_x, 2 * apot / math.sqrt(3) + size_y,
+                # lower left vertex
+                -apot + size_x, apot / math.sqrt(3) + size_y)
 
-        # this manual outline-handling code ensures no line is drawn twice,
-        # which prevents OS-specific Tkinter antialiasing and rounding bugs
+        # This manual outline-handling code ensures no line is
+        # drawn twice, which prevents OS-specific Tkinter antialiasing
+        # and rounding bugs.
 
     @staticmethod
     def draw_field(ui_instance, border):
@@ -94,10 +121,11 @@ class HexGridUIUtilities:
         ui_instance.canvas.delete('all')
 
         # in case the window was resized, ui_instance.apothem and
-        # ui_instance.hshift are invalidated each time the hexgrid is drawn.
-        # this calculation is quite fast, so this is not a performance issue.
-        (ui_instance.apothem, ui_instance.hshift) = HexGridUIUtilities \
-            .apothem_and_hshift_for_size(
+        # ui_instance.hshift are invalidated each time the hexgrid is
+        # drawn. This calculation is quite fast, so this is not a
+        # performance issue.
+        (ui_instance.apothem, ui_instance.hshift) = \
+            HexGridUIUtilities.apothem_and_hshift_for_size(
                 ui_instance.canvas.winfo_width(),
                 ui_instance.canvas.winfo_height(),
                 border,
@@ -118,8 +146,8 @@ class HexGridUIUtilities:
             # the canvas as calculated above
             screen_x += border + ui_instance.hshift
             screen_y += border
-            # the HexGrid class implements Python's array subscripting operator
-            # for (x, y) tuples.
+            # the HexGrid class implements Python's array subscripting
+            # operator for (x, y) tuples.
             tile = ui_instance.hex_grid[pos]
             # the nested brackets for screen_x and screen_y are
             # necessary to wrap them in a tuple,
@@ -129,8 +157,9 @@ class HexGridUIUtilities:
                 (screen_x, screen_y),
                 (field_x, field_y),
                 tile.color())
-            # tile.text() returns None if the tile should not contain any text,
-            # which evaluates to False in a boolean expression
+            # tile.text() returns None if the tile
+            # should not contain any text, which evaluates
+            # to False in a boolean expression
             if tile.text():
                 # fill is the text colour; the background
                 # colour is transparent by default
@@ -140,8 +169,8 @@ class HexGridUIUtilities:
     @staticmethod
     def apothem_and_hshift_for_size(width, height, border, size):
         """
-        Static function called by UI on initialisation and on window resize.
-        Returns the tuple (apothem, hshift).
+        Static function called by UI on initialisation and on window
+        resize. Returns the tuple (apothem, hshift).
         """
 
         # 2 * size - 1 is the number of horizontal
@@ -151,22 +180,24 @@ class HexGridUIUtilities:
         # by 2 on the denominator.
         # Width - 2 * border is the real window width,
         # which is divided by the number of apothems.
-        horizontal_apothem = (width - 2 * border) / (2 * (2 * size - 1))
+        horizontal_apothem = \
+            (width - 2 * border) / (2 * (2 * size - 1))
 
         # there are also 2 * size - 1 rows in the hexgrid,
         # as seen at the top of this file
         num_rows = 2 * size - 1
 
-        # Let d be half the distance from a hex center to its topmost vertex.
-        # Vertically stacked hexagons (alternating left and right)
-        # each contribute 3 * d to the total height.
-        # One d must be added for the final hexagon's bottommost vertex.
-        # Height - 2 * border is the real window height,
+        # Let d be half the distance from a hex center to its topmost
+        # vertex. Vertically stacked hexagons (alternating left and
+        # right) each contribute 3 * d to the total height.
+        # One d must be added for the final hexagon's bottommost
+        # vertex. Height - 2 * border is the real window height,
         # which is then divided by the number of ds.
         # Finally, this number is multiplied by 2
         # as the circumradius (distance from a hex center
         # to a vertex) is equal to 2 * d.
-        dist_centre_to_vertex = ((height - 2 * border) / (3 * num_rows + 1)) * 2
+        dist_centre_to_vertex = (height - 2 * border) \
+            / (3 * num_rows + 1) * 2
         # Trigonometry can then be used to calculate the corresponding
         # apothem by multiplying the circumradius by sqrt(3) / 2
         vertical_apothem = dist_centre_to_vertex * math.sqrt(3) / 2
@@ -188,6 +219,8 @@ class HexGridUIUtilities:
             return (
                 apothem,
                 # extra space on the horizonal
-                math.floor((width - apothem * 2 * (2 * size - 1)) / 2 - border)
+                math.floor(
+                    (width - apothem * 2 * (2 * size - 1))
+                    / 2 - border)
             )
         return (apothem, 0)

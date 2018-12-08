@@ -1,6 +1,6 @@
 """
-This module contains the GameUI class, which represents the main HexSweeper
-window and its various UI elements.
+This module contains the GameUI class, which represents the main
+HexSweeper window and its various UI elements.
 """
 
 from tkinter import Tk, Canvas, Menu
@@ -20,10 +20,12 @@ class GameUI:
     def __init__(self, difficulty):
         self.window = Tk() # create application window
         self.window.title('HexSweeper')
-        self.window.geometry('{}x{}'.format(800, 615)) # default width & height
+        # default width & height
+        self.window.geometry('{}x{}'.format(800, 615))
         self.canvas = Canvas(self.window, bg='white')
         # fill entire window with canvas
-        # fill='both' allows canvas to stretch in both x and y direction
+        # "fill='both'" allows the canvas to stretch
+        # in both x and y direction
         self.canvas.pack(expand=1, fill='both')
 
         # initialized with irrelevant values before

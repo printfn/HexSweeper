@@ -1,5 +1,6 @@
 """
-This module contains the Tile class, which described a single hexagonal tile.
+This module contains the Tile class, which described a
+single hexagonal tile.
 """
 
 class Tile:
@@ -17,23 +18,44 @@ class Tile:
         self._flag = False
 
     def is_revealed(self):
-        """ Checks if the tile is revealed (i.e. has been clicked on) """
+        """
+        Checks if the tile is revealed (i.e. has been clicked on)
+        """
         return self._revealed
 
     def has_mine(self):
-        """ Checks if the tile has a mine """
+        """
+        Checks if the tile has a mine
+        """
         return self._mine
 
     def has_flag(self):
-        """ Checks if the user has set a flag on this tile """
+        """
+        Checks if the user has set a flag on this tile
+        """
         return self._flag
 
+    def adjacent_mine_count(self):
+        """
+        Returns the number of adjacent mines to this current tile
+        """
+        return self.game.adjacent_mine_count(self.x_coord,
+                                             self.y_coord)
+
+    def has_adjacent_mines(self):
+        """
+        Returns whether the current tile has any adjacent mines.
+        """
+        return self.adjacent_mine_count() > 0
+
     def color(self):
-        """ Colour to use for rendering this tile as a hexagon """
+        """
+        Colour to use for rendering this tile as a hexagon
+        """
         if self.is_revealed():
             if self.has_mine():
                 return 'red'
-            if self.game.adjacent_mine_count(self.x_coord, self.y_coord) > 0:
+            if self.has_adjacent_mines():
                 return 'orange'
             return 'lightgreen'
         if self.has_flag():
@@ -41,17 +63,20 @@ class Tile:
         return 'lightblue'
 
     def text(self):
-        """ Text that should be shown on this tile """
+        """
+        Text that should be shown on this tile
+        """
         if not self.has_mine() and self.is_revealed():
-            if self.game.adjacent_mine_count(self.x_coord, self.y_coord) > 0:
-                return str(self.game.adjacent_mine_count(
-                    self.x_coord, self.y_coord))
+            if self.has_adjacent_mines():
+                return str(self.adjacent_mine_count())
         # otherwise return None, which will prevent
         # any text from being shown on this tile
         return None
 
     def can_toggle_flag(self):
-        """ Whether the user is allowed to set/unset flags on this tile """
+        """
+        Whether the user is allowed to set/unset flags on this tile
+        """
         if self.has_flag():
             return True
         old_color = self.color()
@@ -95,8 +120,11 @@ class Tile:
 
     def __repr__(self):
         """
-        Useful only for debugging: this text is printed to the console when
-        you try to print a tile object.
+        Useful only for debugging: this text is printed to the console
+        when you try to print a tile object.
         """
         return '<Tile revealed={} mine={} flag={}>' \
-            .format(self.is_revealed(), self.has_mine(), self.has_flag())
+            .format(
+                self.is_revealed(),
+                self.has_mine(),
+                self.has_flag())

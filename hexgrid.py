@@ -1,6 +1,7 @@
 """
-This module contains the HexGrid class, which represents a HexSweeper game.
-It has all methods needed for the game, except for graphics support.
+This module contains the HexGrid class, which represents a
+HexSweeper game. It has all methods needed for the game, except for
+graphics support.
 """
 
 import random
@@ -11,24 +12,28 @@ from tile import Tile
 
 class HexGrid:
     """
-    This class represents a hexagonal grid of tiles, and has all methods
-    required to support a game of Minesweeper, except for graphics support.
-    Rendering is implemented separately in HexGridUIUtilities and in the other
-    Tkinter-specific UI classes. This means that HexGrid is UI-agnostic and
-    that other UI frameworks can be used without needing to modify this class.
+    This class represents a hexagonal grid of tiles, and has all
+    methods required to support a game of Minesweeper, except for
+    graphics support. Rendering is implemented separately in
+    HexGridUIUtilities and in the other Tkinter-specific UI
+    classes. This means that HexGrid is UI-agnostic and that
+    other UI frameworks can be used without needing to
+    modify this class.
 
     The hexagonal grid is stored in a 2-dimensional nested array.
     In the context of this class:
-        - 'size' refers to the number of tiles in the topmost or bottommost row.
-          All size and coordinate calculations are based on this number.
+        - 'size' refers to the number of tiles in the topmost or
+          bottommost row. All size and coordinate calculations
+          are based on this number.
         - 'y' refers to the row of a specific tile, with
           y = 0 at the top and y = 2 * size - 2 at the bottom.
-        - 'x' refers to the horizontal position of a tile. x = 0 always refers
-          to the first tile in a given row. The highest x coordinate changes
-          depending on the y coordinate, but it changes between size - 1 and
-          2 * size - 2. Because x coordinates depend on y coordinates, the
-          nested array used internally (called self.grid) stores coordinates
-          y first and x second, i.e. self.grid[y][x]
+        - 'x' refers to the horizontal position of a tile. x = 0
+          always refers to the first tile in a given row.
+          The highest x coordinate changes depending on
+          the y coordinate, but it changes between size - 1 and
+          2 * size - 2. Because x coordinates depend on y coordinates,
+          the nested array used internally (called self.grid)
+          stores coordinates y first and x second, i.e. self.grid[y][x]
 
     y coordinates in a hexagonal grid (size = 3):
        0 0 0
@@ -43,10 +48,12 @@ class HexGrid:
      0 1 2 3 4
       0 1 2 3
        0 1 2
-    The 'bending' of the vertical lines is clearly visible in this diagram.
+    The 'bending' of the vertical lines is clearly visible
+    in this diagram.
 
-    Here we can also see that the centre tile is (size - 1, size - 1).
-    This is used for the 'safe' tile in the difficulty selection window.
+    Here we can also see that the centre tile
+    is (size - 1, size - 1). This is used for the 'safe'
+    tile in the difficulty selection window.
 
     This is how the number of cells in a row is calculated:
        0 0 0   count = size + 0 (size + y)
@@ -62,10 +69,13 @@ class HexGrid:
     The highest possible mine count is 1 less than this.
     """
     def __init__(self, size, mine_count):
-        if mine_count > HexGrid.highest_possible_mine_count_for_size(size):
+        max_possible_mine_count = \
+            HexGrid.highest_possible_mine_count_for_size(size)
+
+        if mine_count > max_possible_mine_count:
             # as the mine count is controlled by a slider, this
             # exception should *never* be thrown.
-            field_tiles = self.highest_possible_mine_count_for_size(size) + 1
+            field_tiles = max_possible_mine_count + 1
             message = \
                 ('Invalid mine count! The chosen field size '
                  + 'of {field_size} has {field_tiles} tiles, '
@@ -80,15 +90,17 @@ class HexGrid:
         # validation completed successfully, now initialise the HexGrid
         self.size = size
         self.grid = []
-        self.start_time = time.time() # save number of seconds since epoch
+        # save number of seconds since epoch
+        self.start_time = time.time()
         self.mine_count = mine_count
         # 0 to 2 * size - 2, explained above
         for field_y in range(self.row_count()):
             cell_count_in_current_row = self.cell_count_in_row(field_y)
             row = []
             for field_x in range(cell_count_in_current_row):
-                # as explained in tile.py, all new tiles initially have no mines
-                # mines are only generated on first click to avoid unfair deaths
+                # As explained in tile.py, all new tiles
+                # initially have no mines. Mines are only
+                # generated on first click to avoid unfair deaths.
                 row.append(Tile(self, field_x, field_y))
             self.grid.append(row)
 
@@ -114,7 +126,8 @@ class HexGrid:
 
     def all_valid_coords(self):
         """
-        Return a list of (x, y) tuples that represent all valid coordinates
+        Return a list of (x, y) tuples that
+        represent all valid coordinates
         """
         coords = []
         for field_y in range(self.row_count()):
@@ -126,15 +139,17 @@ class HexGrid:
     def __getitem__(self, pos):
         """
         Implement Python's array subscripting operator [].
-        This allows us to write hexgrid[x, y] instead of hexgrid.grid[y][x].
+        This allows us to write hexgrid[x, y]
+        instead of hexgrid.grid[y][x].
         """
         (field_x, field_y) = pos
         return self.grid[field_y][field_x]
 
     def __setitem__(self, pos, item):
         """
-        Also required for array subscripting, but when being assigned to,
-        i.e. hexgrid[x, y] = tile instead of hexgrid.grid[y][x] = tile.
+        Also required for array subscripting, but when being
+        assigned to, e.g. hexgrid[x, y] = tile instead of
+        hexgrid.grid[y][x] = tile.
         """
         (field_x, field_y) = pos
         self.grid[field_y][field_x] = item
@@ -152,7 +167,8 @@ class HexGrid:
         Validate x and y. Required by UI to validate mouse clicks to
         ensure the user actually clicked on a tile.
         """
-        return self.is_y_valid(field_y) and self.is_x_valid(field_x, field_y)
+        return self.is_y_valid(field_y) and \
+            self.is_x_valid(field_x, field_y)
 
     def adjacent_positions(self, field_x, field_y):
         """
@@ -176,15 +192,16 @@ class HexGrid:
         else: # fields below the center row
             possible_positions.append((field_x + 1, field_y - 1))
             possible_positions.append((field_x - 1, field_y + 1))
-        # the exact coordinate offsets can be verified by checking the graph
-        # and the coordinates of adjacent tiles.
+        # the exact coordinate offsets can be verified by checking the
+        # graph and the coordinates of adjacent tiles.
 
         # Here, the asterisk is used as the tuple unpacking operator.
-        # Filtering possible_positions is required for any edge or corner tiles.
-        # 'filter' takes a lambda expression and returns a lazy list.
-        # Calling the list conversion function on this lazy list forces the
-        # list to be fully evaluated, which is required for many operations
-        # including getting the length of a list.
+        # Filtering possible_positions is required for any edge or
+        # corner tiles. 'filter' takes a lambda expression and
+        # returns a lazy list. Calling the list conversion function
+        # on this lazy list forces the list to be fully evaluated,
+        # which is required for many operations including getting
+        # the length of a list.
         return list(
             filter(
                 lambda pos: self.is_position_valid(*pos),
@@ -201,11 +218,12 @@ class HexGrid:
                     # there is a mine at position pos
                     lambda pos: self[pos].has_mine(),
                     self.adjacent_positions(field_x, field_y)
-                ) # this means that the filter statement returns a lazy list
-                  # that contains all adjacent tile coordinates with mines
+                ) # this means that the filter statement returns a
+                  # lazy list that contains all adjacent tile
+                  # coordinates with mines
             ) # this lazy list is then computed and converted
-              # to an eager list before I can get its
-              # length, as in the method HexGrid.adjacent_positions above
+              # to an eager list before we can get its length,
+              # as in the method HexGrid.adjacent_positions above
         ) # and finally its length is calculated
           # this length now describes the number
           # of adjacent mines of a given position
@@ -225,29 +243,36 @@ class HexGrid:
             #  ~^~
             #   F
             #
-            [int(self[pos].has_flag()) for pos in self.all_valid_coords()]
-        ) #   ^  ~~~~^~~~~ ~~~~^~~~~~  ~^~        ^~~~~~~~~~~~~~~~~~~~~~~
-          #   E      C         D        B         A
+            # E      C         D
+            #~v~ ~~~~v~~~~ ~~~~v~~~~~
+            [int(self[pos].has_flag())
+             for pos in self.all_valid_coords()])
+#            ~^~        ^~~~~~~~~~~~~~~~~~~~~~~
+#             B         A
 
     def flag_limit_reached(self):
-        """ Has the user reached the flag limit (and thus can't place more)? """
+        """
+        Has the user reached the flag limit,
+        and is thus unable to place more?
+        """
         return self.total_flag_count() >= self.mine_count
 
     def restart_game(self, size=None, mine_count=None):
         """
-        Restart the game. 'size' and 'mine_count' are optional parameters.
-        They are initialized to previous values if no explicit
-        arguments were passed.
+        Restart the game. 'size' and 'mine_count' are optional
+        parameters. They are initialized to previous values if no
+        explicit arguments were passed.
         """
         if not size:
             size = self.size
         if not mine_count:
             mine_count = self.mine_count
-        # reinitialize the object in place by explicitly calling __init__
+        # reinitialize the object in place by explicitly
+        # calling __init__
         self.__init__(size, mine_count)
 
     def restart_if_game_is_over(self, redraw, show_alert):
-        """ If game is over, show an alert and then restart the game. """
+        """ If game is over, show an alert and restart the game. """
 
         #     checking for game over:
         # (A)   - mines have not yet been generated    -> return  (A)
@@ -265,10 +290,15 @@ class HexGrid:
 
         # B
         # list of booleans showing flag positions
-        flag_list = [self[pos].has_flag() for pos in self.all_valid_coords()]
+        flag_list = [self[pos].has_flag() \
+            for pos in self.all_valid_coords()]
+
         # list of booleans showing mine positions
-        mine_list = [self[pos].has_mine() for pos in self.all_valid_coords()]
-        if mine_list == flag_list: # compare the two lists element by element
+        mine_list = [self[pos].has_mine() \
+            for pos in self.all_valid_coords()]
+
+        # compare the two lists element by element
+        if mine_list == flag_list:
             # game over and player won as all
             # flags have been placed correctly
             game_won = True
@@ -289,15 +319,16 @@ class HexGrid:
                     self[pos].reveal()
             redraw()
             end_time = time.time()
-            minutes = (end_time - self.start_time) // 60
-            seconds = end_time - self.start_time - 60 * minutes
+            mins = (end_time - self.start_time) // 60
+            secs = end_time - self.start_time - 60 * mins
             duration = ""
-            if minutes == 0:
-                duration = "%1.3f seconds" % seconds
-            elif minutes == 1:
-                duration = "1 minute and %1.3f seconds" % seconds
+            if mins == 0:
+                duration = "%1.3f seconds" % secs
+            elif mins == 1:
+                duration = "1 minute and %1.3f seconds" % secs
             else:
-                duration = "%d minutes and %1.3f seconds" % (minutes, seconds)
+                duration = "%d minutes and %1.3f seconds" % (mins,
+                                                             secs)
             show_alert(
                 "Minesweeper",
                 "Congratulations!\nYou won the game in {}." \
@@ -307,17 +338,15 @@ class HexGrid:
             return
 
         # D
-        # check for game loss
-        # backslash tells python to continue
-        # this statement onto the next line
+        # Check for game loss.
         revealed_mine_positions = \
-            [pos for pos in self.all_valid_coords() # check all valid positions
-             if self[pos].has_mine()                # if there is a mine
-             and self[pos].is_revealed()]           # and there it's
-                                                    # been clicked on
+            [pos for pos in self.all_valid_coords()
+             if self[pos].has_mine()
+             and self[pos].is_revealed()]
+
         # if any mine has been revealed, handle game loss
-        # 'revealed_mine_positions' is a list, so this checks if the list
-        # is non-empty
+        # 'revealed_mine_positions' is a list, so this checks if the
+        # list is non-empty
         if revealed_mine_positions:
             for pos in self.all_valid_coords():
                 if not self[pos].has_flag():
@@ -336,8 +365,8 @@ class HexGrid:
         """
         Handle mine generation when user first clicks on a tile.
         The x and y coordinates passed to this function represent.
-        The location the user clicked on. This position will never contain a
-        mine as that would be an unfair game loss.
+        The location the user clicked on. This position will never
+        contain a mine as that would be an unfair game loss.
         """
 
         if self.mines_have_been_generated:
@@ -351,18 +380,23 @@ class HexGrid:
         # randomly place self.mine_count mines
         # random_sample prevents multiple mines from being generated
         # on the same tile
-        mine_positions = random.sample(possible_mine_locations, self.mine_count)
+        mine_positions = random.sample(
+            possible_mine_locations, self.mine_count)
+
         for pos in mine_positions:
-            self[pos].change_into_mine() # turn all selected tiles into mines
-                                         # see tile.py for more info on this
+            # turn all selected tiles into mines
+            # see tile.py for more info on this
+            self[pos].change_into_mine()
 
         self.mines_have_been_generated = True
-        self.start_time = time.time() # save number of seconds since epoch
+
+        # save number of seconds since epoch (floating-point)
+        self.start_time = time.time()
 
     def reveal_mines_from(self, field_x, field_y):
         """
         Now search for all possible adjacent tiles to reveal as well.
-        Queue-based iterative (non-recursive) implementation of flood fill.
+        Queue-based iterative implementation of flood fill.
         """
         queue = [(field_x, field_y)]
         complete = []
@@ -372,11 +406,13 @@ class HexGrid:
                 continue
             # destructuring tuple assignment
             (current_x, current_y) = queue[0]
-            # append tuple of current position ((double brackets required))
+            # append tuple of current position
+            #     ((double brackets required))
             complete.append((current_x, current_y))
             self[current_x, current_y].reveal()
             del queue[0]
-            adjacent_tiles = self.adjacent_positions(current_x, current_y)
+            adjacent_tiles = self.adjacent_positions(
+                current_x, current_y)
             # reveal tiles with adjacent mines, but don't search
             # any further (if they have adjacent mines) (or unless they
             # don't have adjacent mines)
@@ -385,14 +421,15 @@ class HexGrid:
                 if self.adjacent_mine_count(*adj_tile) == 0:
                     queue.append(adj_tile)
 
-    def primary_click(self, screen_coords, apothem, redraw, show_alert):
+    def primary_click(
+            self, screen_coords, apothem, redraw, show_alert):
         """ Click handler for primary (usually left) mouse button """
         (screen_x, screen_y) = screen_coords
         (field_x, field_y) = self.screen_coordinates_to_game_position(
-            screen_x,
-            screen_y,
-            apothem)
-        if not self.is_position_valid(field_x, field_y): # error handling
+            screen_x, screen_y, apothem)
+
+        # error handling
+        if not self.is_position_valid(field_x, field_y):
             return
         if self[field_x, field_y].has_flag():
             # flags prevent accidental clicks, so don't
@@ -420,15 +457,19 @@ class HexGrid:
         # has no access to UI objects
         self.restart_if_game_is_over(redraw, show_alert)
 
-    def secondary_click(self, screen_coords, apothem, redraw, show_alert):
-        """ Click handler for secondary (usually right) mouse button """
+    def secondary_click(
+            self, screen_coords, apothem, redraw, show_alert):
+        """
+        Click handler for secondary (usually right) mouse button
+        """
         (screen_x, screen_y) = screen_coords
         (field_x, field_y) = self.screen_coordinates_to_game_position(
             screen_x,
             screen_y,
             apothem)
 
-        if not self.is_position_valid(field_x, field_y): # error handling
+        # error handling
+        if not self.is_position_valid(field_x, field_y):
             return
 
         if not self[field_x, field_y].can_toggle_flag():
@@ -453,7 +494,8 @@ class HexGrid:
 
         self.restart_if_game_is_over(redraw, show_alert)
 
-    def game_position_to_screen_coordinates(self, field_x, field_y, apothem):
+    def game_position_to_screen_coordinates(
+            self, field_x, field_y, apothem):
         """
         Apothem is the distance from center to the
         middle of an edge of a regular hexagon
@@ -484,7 +526,8 @@ class HexGrid:
         screen_x = apothem * (max_row_count - row_count)
         # move over to correct cell
         screen_x += 2 * apothem * field_x
-        # add another apothem to move from left tile edge to tile center
+        # add another apothem to move from left
+        # tile edge to tile center
         screen_x += apothem
 
         # distance_tile_center_to_vertex is also the hypothenuse
@@ -500,28 +543,32 @@ class HexGrid:
         # of hex
         distance_tile_center_to_vertex = 2 * apothem / math.sqrt(3)
         vertical_tile_distance = 1.5 * distance_tile_center_to_vertex
-        screen_y = field_y * vertical_tile_distance + distance_tile_center_to_vertex
+        screen_y = field_y * vertical_tile_distance + \
+            distance_tile_center_to_vertex
         # approximate, could be 1 off
         # in either direction
         screen_y = int(screen_y)
 
         return (screen_x, screen_y)
 
-    def screen_coordinates_to_game_position(self, screen_x, screen_y, apothem):
+    def screen_coordinates_to_game_position(
+            self, screen_x, screen_y, apothem):
         """
         This simply reverses the calculations in
         HexGrid.game_position_to_screen_coordinates
         """
         distance_tile_center_to_vertex = 2 * apothem / math.sqrt(3)
-        vertical_tile_distance = 1.5 * distance_tile_center_to_vertex # as above
+        # as above
+        vertical_tile_distance = 1.5 * distance_tile_center_to_vertex
         field_y = round(
-            (screen_y - distance_tile_center_to_vertex) / vertical_tile_distance
-        )
+            (screen_y - distance_tile_center_to_vertex) \
+                / vertical_tile_distance)
 
         row_count = self.cell_count_in_row(field_y)
         max_row_count = self.highest_row_cell_count()
 
-        field_x = screen_x - apothem # move from tile center to left tile edge
+        # move from tile center to left tile edge
+        field_x = screen_x - apothem
         field_x -= apothem * (max_row_count - row_count)
         field_x = round(field_x / apothem / 2)
         return (field_x, field_y)
