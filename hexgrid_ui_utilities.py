@@ -131,6 +131,9 @@ class HexGridUIUtilities:
                 border,
                 ui_instance.hex_grid.size)
 
+        font = ('Arial', HexGridUIUtilities.font_size_for_apothem(
+            ui_instance.apothem))
+
         # now draw every hexagonal tile individually
         for pos in ui_instance.hex_grid.all_valid_coords():
             # field x, field y (in the grid coordinate screen_ystem)
@@ -164,7 +167,7 @@ class HexGridUIUtilities:
                 # fill is the text colour; the background
                 # colour is transparent by default
                 ui_instance.canvas.create_text(
-                    screen_x, screen_y, text=tile.text(), fill="black")
+                    screen_x, screen_y, text=tile.text(), font=font, fill="black")
 
     @staticmethod
     def apothem_and_hshift_for_size(width, height, border, size):
@@ -224,3 +227,17 @@ class HexGridUIUtilities:
                     / 2 - border)
             )
         return (apothem, 0)
+
+    @staticmethod
+    def font_size_for_apothem(apothem):
+        """
+        This method computes the most appropriate font size
+        for the given apothem. The result is always an integer.
+        """
+        if apothem < 15:
+            return math.floor(apothem * 1.1)
+
+        if apothem > 50:
+            return 30
+
+        return math.floor(apothem * 0.7)
