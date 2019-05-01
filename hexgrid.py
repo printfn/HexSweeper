@@ -276,44 +276,22 @@ class HexGrid:
 
         #     checking for game over:
         # (A)   - mines have not yet been generated    -> return  (A)
-        # (B)   - all flags have been placed correctly -> win     (B)
-        # (C)   - all non-mine tiles are revealed      -> win     (C)
-        # (D)   - a mine is revealed                   -> lose    (D)
-        # (E)   - otherwise                            -> return  (E)
+        # (C)   - all non-mine tiles are revealed      -> win     (B)
+        # (D)   - a mine is revealed                   -> lose    (C)
+        # (E)   - otherwise                            -> return  (D)
 
         # A
         if not self.mines_have_been_generated:
             redraw()
             return
 
-        game_won = False
-
         # B
-        # list of booleans showing flag positions
-        flag_list = [self[pos].has_flag() \
-            for pos in self.all_valid_coords()]
-
-        # list of booleans showing mine positions
-        mine_list = [self[pos].has_mine() \
-            for pos in self.all_valid_coords()]
-
-        # compare the two lists element by element
-        if mine_list == flag_list:
-            # game over and player won as all
-            # flags have been placed correctly
-            game_won = True
-
-        # C
         number_of_safe_hidden_tiles = len(
             [pos for pos in self.all_valid_coords()
              if not self[pos].has_mine()
              and not self[pos].is_revealed()])
         if number_of_safe_hidden_tiles == 0:
-            # no safe but hidden tiles -> win (C)
-            game_won = True
-
-        # handle B and C
-        if game_won:
+            # no safe but hidden tiles -> win (B)
             for pos in self.all_valid_coords():
                 if not self[pos].has_flag():
                     self[pos].reveal()
@@ -337,7 +315,7 @@ class HexGrid:
             redraw()
             return
 
-        # D
+        # C
         # Check for game loss.
         revealed_mine_positions = \
             [pos for pos in self.all_valid_coords()
@@ -357,7 +335,7 @@ class HexGrid:
             redraw()
             return
 
-        # E
+        # D
         # game continues
         redraw()
 
@@ -485,7 +463,8 @@ class HexGrid:
                     .format(self.mine_count)
                     + "This means that at least one of your "
                     + "flags is incorrectly placed.\n"
-                    + "Removing any incorrect flags will "
+                    + "Removing any incorrect flags and "
+                    + "revealing those tiles will "
                     + "allow you to win the game.")
                 return
             self[field_x, field_y].set_flag()
