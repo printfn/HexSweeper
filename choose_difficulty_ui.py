@@ -4,27 +4,30 @@ difficulty. It corresponds to the window accessible under
 Game -> New (Custom).
 """
 
-from tkinter import Toplevel, Grid, Label, Button, Canvas, Scale
+from tkinter import Toplevel, Grid, Label, Button, Canvas, Scale, Event
 from tkinter import HORIZONTAL, N, E, S, W
+from typing import TYPE_CHECKING, Callable
 
 from hexgrid import HexGrid
 from hexgrid_ui_utilities import HexGridUIUtilities
+if TYPE_CHECKING:
+    from game_ui import GameUI # pylint: disable=cyclic-import
 
-class ChooseDifficultyUI:
+class ChooseDifficultyView:
     """
-    This class represents the window used to choose a
-    custom game difficulty.
+    This class purely represents the view of the "Choose Difficulty"
+    window. It helps separate the controls from the logic code.
     """
-    def __init__(self, game_ui):
-        self.game_ui = game_ui
+    def __init__(
+            self,
+            update_slider_range: Callable[[Event], None],
+            draw_field: Callable[[Event], None]) -> None:
         # programs can only have one window, but can
         # create multiple "Toplevel"s (effectively new windows)
         self.window = Toplevel()
         self.window.title('HexSweeper - Choose Difficulty')
         self.window.geometry('400x473')
-        self.window.bind('<Configure>',
-                         lambda event: self.draw_field())
-        self.window.protocol("WM_DELETE_WINDOW", self.on_window_close)
+        self.window.bind('<Configure>', draw_field)
 
         # these statements allow the hexgrid (in col 1, row 3)
         # to stretch as the window is resized
@@ -45,7 +48,7 @@ class ChooseDifficultyUI:
             from_=2,
             to=15,
             orient=HORIZONTAL,
-            command=lambda event: self.update_slider_range()
+            command=update_slider_range
         )
         self.game_size_slider.grid(row=0, column=1, sticky=E + W)
 
@@ -56,27 +59,9 @@ class ChooseDifficultyUI:
             from_=1,
             to=315,
             orient=HORIZONTAL,
-            command=lambda event: self.draw_field()
+            command=draw_field
         )
         self.mine_count_slider.grid(row=1, column=1, sticky=E + W)
-
-        # set default slider values to values from the previous game
-        # this makes it easier for the user to make small adjustments
-        # without having to remember previous game values
-        self.game_size_slider.set(self.game_ui.hex_grid.size)
-        self.last_size = self.game_ui.hex_grid.size
-        self.mine_count_slider.config(
-            to=HexGrid.highest_possible_mine_count_for_size(
-                self.game_ui.hex_grid.size
-            )
-        )
-        self.mine_count_slider.set(self.game_ui.hex_grid.mine_count)
-
-        Button(
-            self.window,
-            text='Select this difficulty',
-            command=self.select_difficulty_clicked
-        ).grid(row=2, column=0, columnspan=2)
 
         self.canvas = Canvas(self.window, bg='white')
         self.canvas.grid(
@@ -87,20 +72,63 @@ class ChooseDifficultyUI:
             # resize with the window
             sticky=E + N + W + S)
 
+    def close_window(self):
+        """ Close the difficulty selection window """
+        self.window.destroy()
+
+    def set_mine_count_slider_upper_bound(self, upper_bound):
+        """ Set the upper bound of the mine count slider """
+        self.mine_count_slider.config(to=upper_bound)
+
+class ChooseDifficultyUI:
+    """
+    This class represents the window used to choose a
+    custom game difficulty.
+    """
+    def __init__(self, game_ui: 'GameUI') -> None:
+        self.view = ChooseDifficultyView(
+            lambda event: self.update_slider_range(),
+            lambda event: self.draw_field())
+        self.canvas = self.view.canvas
+        self.game_ui = game_ui
+        # initialise these to arbitrary values, as these are
+        # overwritten before being used anyway
+        self.apothem: float = 0
+        self.hshift: float = 0
+        self.view.window.protocol("WM_DELETE_WINDOW", self.on_window_close)
+
+        # set default slider values to values from the previous game
+        # this makes it easier for the user to make small adjustments
+        # without having to remember previous game values
+        self.view.game_size_slider.set(self.game_ui.hex_grid.size)
+        self.last_size = self.game_ui.hex_grid.size
+        self.view.set_mine_count_slider_upper_bound(
+            HexGrid.highest_possible_mine_count_for_size(
+                self.game_ui.hex_grid.size
+            )
+        )
+        self.view.mine_count_slider.set(self.game_ui.hex_grid.mine_count)
+
+        Button(
+            self.view.window,
+            text='Select this difficulty',
+            command=self.select_difficulty_clicked
+        ).grid(row=2, column=0, columnspan=2)
+
         self.draw_field()
 
         # put self.window in the foreground and
         # make self.game_ui.window (the root window) inaccessible
-        self.window.transient(self.game_ui.window)
-        self.window.grab_set()
-        self.game_ui.window.wait_window(self.window)
+        self.view.window.transient(self.game_ui.window)
+        self.view.window.grab_set()
+        self.game_ui.window.wait_window(self.view.window)
 
     @staticmethod
-    def border():
+    def border() -> int:
         """ Return fixed border size (on all sides) """
         return 20
 
-    def update_slider_range(self):
+    def update_slider_range(self) -> None:
         """
         When the board size slider is adjusted, the mine count slider
         is readjusted to maintain the same ratio of empty tiles
@@ -112,8 +140,8 @@ class ChooseDifficultyUI:
         The maximum value for the mine count slider is also adjusted
         based on HexGrid.highest_possible_mine_count_for_size().
         """
-        new_size = self.game_size_slider.get()
-        last_mine_count = self.mine_count_slider.get()
+        new_size = self.view.game_size_slider.get()
+        last_mine_count = self.view.mine_count_slider.get()
         if new_size == self.last_size:
             # unchanged, no need to make adjustments
             return
@@ -126,7 +154,7 @@ class ChooseDifficultyUI:
             HexGrid.highest_possible_mine_count_for_size(new_size)
 
         # update mine count slider upper bound
-        self.mine_count_slider.config(to=new_max_mine_count)
+        self.view.set_mine_count_slider_upper_bound(new_max_mine_count)
 
         # Calculate new suggested mine count using proportion
         # of mines to total mine count (here max_mine_count, which
@@ -135,22 +163,22 @@ class ChooseDifficultyUI:
         new_suggested_mine_count = round(
             last_mine_count / last_max_mine_count * new_max_mine_count
         )
-        self.mine_count_slider.set(new_suggested_mine_count)
+        self.view.mine_count_slider.set(new_suggested_mine_count)
 
         # set self.last_size so it can be used next time when
         # the slider is updated and this event handler is called
-        self.last_size = self.game_size_slider.get()
+        self.last_size = self.view.game_size_slider.get()
 
         # the field preview also needs to be
         # redrawn after all these adjustments
         self.draw_field()
 
-    def draw_field(self):
+    def draw_field(self) -> None:
         """
         Redraw the preview field. Includes generating a new HexGrid.
         """
-        size = self.game_size_slider.get()
-        mine_count = self.mine_count_slider.get()
+        size = self.view.game_size_slider.get()
+        mine_count = self.view.mine_count_slider.get()
         # create a new, random HexGrid on every redraw
         # this only causes slight lag with huge field sizes,
         # so it is not a major issue
@@ -169,7 +197,7 @@ class ChooseDifficultyUI:
         # actual game (see game_ui.py)
         HexGridUIUtilities.draw_field(self, self.border())
 
-    def select_difficulty_clicked(self):
+    def select_difficulty_clicked(self) -> None:
         """
         Called when the user clicks on the "Select difficulty"
         button. Selected board size and mine count are saved
@@ -177,13 +205,13 @@ class ChooseDifficultyUI:
         handler is called, which takes care of closing the window,
         restoring focus to the actual game and redrawing the game.
         """
-        size = self.game_size_slider.get()
-        mine_count = self.mine_count_slider.get()
+        size = self.view.game_size_slider.get()
+        mine_count = self.view.mine_count_slider.get()
         self.game_ui.hex_grid.size = size
         self.game_ui.hex_grid.mine_count = mine_count
         self.on_window_close()
 
-    def on_window_close(self):
+    def on_window_close(self) -> None:
         """
         Called when the user either closes the window using the
         red 'X' or when the user clicks on the "Select difficulty"
@@ -195,4 +223,4 @@ class ChooseDifficultyUI:
         self.game_ui.hex_grid.restart_game()
         self.game_ui.window.focus_set()
         self.game_ui.draw_field()
-        self.window.destroy()
+        self.view.close_window()

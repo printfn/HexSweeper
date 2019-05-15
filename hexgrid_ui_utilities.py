@@ -4,6 +4,24 @@ static utility methods for the UI code.
 """
 
 import math
+from typing import TYPE_CHECKING
+from typing import Tuple, Optional # pylint: disable=unused-import
+from tkinter import Canvas
+
+if TYPE_CHECKING:
+    # pylint: disable=import-error, unused-import, missing-docstring
+    # pylint: disable=too-few-public-methods
+    from typing_extensions import Protocol
+    from hexgrid import HexGrid
+    class UIProtocol(Protocol):
+        apothem: float
+        hshift: float
+        canvas: Canvas
+        hex_grid: HexGrid
+else:
+    class UIProtocol:
+        # pylint: disable=missing-docstring, too-few-public-methods
+        pass
 
 class HexGridUIUtilities:
     """
@@ -12,7 +30,11 @@ class HexGridUIUtilities:
     Used by both GameUI and ChooseDifficultyUI.
     """
     @staticmethod
-    def draw_hexagon(ui_instance, screen_pos, game_pos, fill):
+    def draw_hexagon(
+            ui_instance: 'UIProtocol',
+            screen_pos: Tuple[float, float],
+            game_pos: Tuple[int, int],
+            fill: str) -> None:
         """
         Draw a single coloured hexagon.
         ui_instance: any class that has the following members:
@@ -109,7 +131,7 @@ class HexGridUIUtilities:
         # and rounding bugs.
 
     @staticmethod
-    def draw_field(ui_instance, border):
+    def draw_field(ui_instance: UIProtocol, border: float) -> None:
         """
         Draw a complete hexagonal grid.
         ui_instance: as for HexGridUIUtilities.draw_hexagon.
@@ -170,7 +192,11 @@ class HexGridUIUtilities:
                     screen_x, screen_y, text=tile.text(), font=font, fill="black")
 
     @staticmethod
-    def apothem_and_hshift_for_size(width, height, border, size):
+    def apothem_and_hshift_for_size(
+            width: float,
+            height: float,
+            border: float,
+            size: int) -> Tuple[float, float]:
         """
         Static function called by UI on initialisation and on window
         resize. Returns the tuple (apothem, hshift).
@@ -229,7 +255,7 @@ class HexGridUIUtilities:
         return (apothem, 0)
 
     @staticmethod
-    def font_size_for_apothem(apothem):
+    def font_size_for_apothem(apothem: float) -> int:
         """
         This method computes the most appropriate font size
         for the given apothem. The result is always an integer.
