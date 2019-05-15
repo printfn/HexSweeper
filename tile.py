@@ -123,8 +123,6 @@ class Tile:
         Useful only for debugging: this text is printed to the console
         when you try to print a tile object.
         """
-        return '<Tile revealed={} mine={} flag={}>' \
-            .format(
-                self.is_revealed(),
-                self.has_mine(),
-                self.has_flag())
+        return (f'<Tile revealed={self.is_revealed()} '
+                + f'mine={self.has_mine()} '
+                + f'flag={self.has_flag()}>')

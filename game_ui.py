@@ -21,7 +21,7 @@ class GameUI:
         self.window = Tk() # create application window
         self.window.title('HexSweeper')
         # default width & height
-        self.window.geometry('{}x{}'.format(800, 615))
+        self.window.geometry(f'{800}x{615}')
         self.canvas = Canvas(self.window, bg='white')
         # fill entire window with canvas
         # "fill='both'" allows the canvas to stretch

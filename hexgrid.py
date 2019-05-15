@@ -78,13 +78,10 @@ class HexGrid:
             field_tiles = max_possible_mine_count + 1
             message = \
                 ('Invalid mine count! The chosen field size '
-                 + 'of {field_size} has {field_tiles} tiles, '
-                 + 'but you chose to generate {mine_count} mines. '
+                 + f'of {size} has {field_tiles} tiles, '
+                 + f'but you chose to generate {mine_count} mines. '
                  + 'Note that at least one field must be left '
-                 + 'blank for the game to be winnable.').format(
-                     field_size=size,
-                     field_tiles=field_tiles,
-                     mine_count=mine_count)
+                 + 'blank for the game to be winnable.')
             raise Exception(message)
 
         # validation completed successfully, now initialise the HexGrid
@@ -309,8 +306,7 @@ class HexGrid:
                                                              secs)
             show_alert(
                 "Minesweeper",
-                "Congratulations!\nYou won the game in {}." \
-                    .format(duration))
+                f"Congratulations!\nYou won the game in {duration}.")
             self.restart_game()
             redraw()
             return
@@ -459,8 +455,8 @@ class HexGrid:
                 show_alert(
                     # mine count is always equal to flag limit
                     "Minesweeper",
-                    "You've reached the flag limit of {}.\n"
-                    .format(self.mine_count)
+                    "You've reached the flag "
+                    + f"limit of {self.mine_count}.\n"
                     + "This means that at least one of your "
                     + "flags is incorrectly placed.\n"
                     + "Removing any incorrect flags and "
