@@ -2,4 +2,3 @@
 
 mypy .
 pylint *.py
-
