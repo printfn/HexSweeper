@@ -1,4 +1,4 @@
 #!/bin/bash
 
 mypy .
-pylint *.py
+pylint ./*.py
