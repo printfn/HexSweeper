@@ -358,8 +358,8 @@ class HexGrid:
     def try_generate_mines(self, field_x: int, field_y: int) -> None:
         """
         Handle mine generation when user first clicks on a tile.
-        The x and y coordinates passed to this function represent.
-        The location the user clicked on. This position will never
+        The x and y coordinates passed to this function represent
+        the location the user clicked on. This position will never
         contain a mine as that would be an unfair game loss.
         """
 
