@@ -191,6 +191,11 @@ class HexGridUIUtilities:
                 ui_instance.canvas.create_text(
                     screen_x, screen_y, text=tile.text(), font=font, fill="black")
 
+        # actually update the canvas: omitting this causes a bug when
+        # clicking on a mine, with the Game Over prompt being shown
+        # without the UI having updated in the background
+        ui_instance.canvas.update_idletasks()
+
     @staticmethod
     def apothem_and_hshift_for_size(
             width: float,
