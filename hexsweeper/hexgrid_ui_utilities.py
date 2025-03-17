@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     # pylint: disable=import-error, unused-import, missing-docstring
     # pylint: disable=too-few-public-methods
     from typing_extensions import Protocol
-    from hexgrid import HexGrid
+    from hexsweeper.hexgrid import HexGrid
     class UIProtocol(Protocol):
         apothem: float
         hshift: float

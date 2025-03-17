@@ -2,3 +2,6 @@ __pycache__/
 .mypy_cache/
 *.pyc
 .DS_Store
+/.venv/
+/*.egg-info/
+/build/

@@ -9,7 +9,7 @@ import math
 import time
 from typing import List, Tuple, Callable, Optional
 
-from tile import Tile
+from hexsweeper.tile import Tile
 
 class HexGrid:
     """

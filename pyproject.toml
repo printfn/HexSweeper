@@ -1,0 +1,11 @@
+[project]
+name = "hexsweeper"
+version = "1.0.0"
+description = "Hexagonal Minesweeper"
+readme = "README.md"
+requires-python = ">=3.6"
+license = { text = "GPL-3.0-or-later" }
+dependencies = []
+
+[project.gui-scripts]
+hexsweeper = "hexsweeper.main:run"

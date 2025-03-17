@@ -7,10 +7,10 @@ from tkinter import Tk, Canvas, Menu, Event, Widget
 from tkinter import messagebox
 from typing import List, Any
 
-from hexgrid import HexGrid
-from choose_difficulty_ui import ChooseDifficultyUI
-from difficulty import Difficulty
-from hexgrid_ui_utilities import HexGridUIUtilities
+from hexsweeper.hexgrid import HexGrid
+from hexsweeper.choose_difficulty_ui import ChooseDifficultyUI
+from hexsweeper.difficulty import Difficulty
+from hexsweeper.hexgrid_ui_utilities import HexGridUIUtilities
 
 class GameUI:
     """
@@ -19,7 +19,7 @@ class GameUI:
     it initialises Tkinter and it forwards mouse
     events to the HexGrid instance.
     """
-    def __init__(self, difficulty: Difficulty) -> None:
+    def __init__(self, difficulty: Difficulty = Difficulty.EASY) -> None:
         self.window = Tk() # create application window
         self.window.title('HexSweeper')
         # default width & height

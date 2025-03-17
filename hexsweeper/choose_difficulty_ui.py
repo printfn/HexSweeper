@@ -8,10 +8,10 @@ from tkinter import Toplevel, Grid, Label, Button, Canvas, Scale, Event
 from tkinter import HORIZONTAL, N, E, S, W
 from typing import TYPE_CHECKING, Callable
 
-from hexgrid import HexGrid
-from hexgrid_ui_utilities import HexGridUIUtilities
+from hexsweeper.hexgrid import HexGrid
+from hexsweeper.hexgrid_ui_utilities import HexGridUIUtilities
 if TYPE_CHECKING:
-    from game_ui import GameUI # pylint: disable=cyclic-import
+    from hexsweeper.game_ui import GameUI # pylint: disable=cyclic-import
 
 class ChooseDifficultyView:
     """
