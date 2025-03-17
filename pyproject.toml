@@ -1,6 +1,6 @@
 [project]
 name = "hexsweeper"
-version = "1.0.1"
+version = "1.0.2"
 description = "Hexagonal Minesweeper"
 readme = "README.md"
 requires-python = ">=3.13"

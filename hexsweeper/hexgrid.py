@@ -95,7 +95,7 @@ class HexGrid:
                  + f'but you chose to generate {mine_count} mines. '
                  + 'Note that at least one field must be left '
                  + 'blank for the game to be winnable.')
-            raise Exception(message)
+            raise ValueError(message)
 
         # validation completed successfully, now initialise the HexGrid
         self.size = size
@@ -251,13 +251,13 @@ class HexGrid:
         # (F) Sum of ones and zeroes is the number flags on map (F)
 
         return sum(
-            #  ~^~
-            #   F
-            #
-            # E      C         D
-            #~v~ ~~~~v~~~~ ~~~~v~~~~~
-            [int(self[pos].has_flag())
-             for pos in self.all_valid_coords()])
+        #      ~^~
+        #       F
+        #
+        #    E      C         D
+        #   ~v~ ~~~~v~~~~ ~~~~v~~~~~
+            int(self[pos].has_flag())
+             for pos in self.all_valid_coords())
 #            ~^~        ^~~~~~~~~~~~~~~~~~~~~~~
 #             B         A
 
@@ -318,12 +318,11 @@ class HexGrid:
             secs = end_time - self.start_time - 60 * mins
             duration = ""
             if mins == 0:
-                duration = "%1.3f seconds" % secs
+                duration = f"{secs:.3f} seconds"
             elif mins == 1:
-                duration = "1 minute and %1.3f seconds" % secs
+                duration = f"1 minute and {secs:.3f} seconds"
             else:
-                duration = "%d minutes and %1.3f seconds" % (mins,
-                                                             secs)
+                duration = f"{mins} minutes and {secs:.3f} seconds"
             show_alert(
                 "Minesweeper",
                 f"Congratulations!\nYou won the game in {duration}.")
